@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using GroupDocs.Comparison;
+using GroupDocs.Comparison.Options;
 
 namespace Server
 {
@@ -31,7 +30,11 @@ namespace Server
 
             Image img = Image.FromStream(ms);
 
-            img.Save(AppDomain.CurrentDomain.BaseDirectory + "file.jpeg", ImageFormat.Jpeg);
+            var filePath = AppDomain.CurrentDomain.BaseDirectory + "file.jpeg";
+            var filterFilePath = AppDomain.CurrentDomain.BaseDirectory + "filter_file.jpeg";
+            var compareFilePath = AppDomain.CurrentDomain.BaseDirectory + "compare_file.jpeg";
+
+            img.Save(filePath, ImageFormat.Jpeg);
 
             var filter = new float[,]
             {
@@ -40,7 +43,15 @@ namespace Server
                 { 0, 1, 0 }
             };
 
-            Convolve.Apply(img, filter).Save(AppDomain.CurrentDomain.BaseDirectory + "filter_file.jpeg", ImageFormat.Jpeg);
+            Convolve.Apply(img, filter).Save(filterFilePath, ImageFormat.Jpeg);
+
+            using (Comparer comparer = new Comparer(filePath))
+            {
+                CompareOptions options = new CompareOptions();
+                options.GenerateSummaryPage = false;
+                comparer.Add(filterFilePath);
+                comparer.Compare(compareFilePath);
+            }
 
             listenerAccept.Send(Encoding.UTF8.GetBytes("Спасибо за картинку в " + data.Length.ToString() + " бит"));
 

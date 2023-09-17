@@ -54,7 +54,9 @@ namespace Client
 
             Console.WriteLine("Сокет соединяется с {0} ", sender.RemoteEndPoint.ToString());
 
-            Console.WriteLine("\nОтправлено пакетов на сервер: ", SendVarData(sender, bmpBytes));
+            var response = SendVarData(sender, bmpBytes);
+
+            Console.WriteLine("\nОтправлено пакетов на сервер: ", response);
 
             int bytesRec = sender.Receive(bytes);
 
@@ -97,7 +99,7 @@ namespace Client
                 for (int y = 0; y < btp.Height; y++)
                 {
                     int q = rnd.Next(100);
-                    if (q <= 20) btp.SetPixel(x, y, Color.Gray);
+                    if (q <= 3) btp.SetPixel(x, y, Color.Gray);
                 }
             return btp;
         }
